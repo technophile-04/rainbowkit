@@ -6,16 +6,21 @@ import React, {
   useEffect,
   useMemo,
   useState,
-} from 'react';
-import { useAccount, useAccountEffect, useConfig } from 'wagmi';
-import { useConnectionStatus } from '../../hooks/useConnectionStatus';
-import { AccountModal } from '../AccountModal/AccountModal';
-import { ChainModal } from '../ChainModal/ChainModal';
-import { ConnectModal } from '../ConnectModal/ConnectModal';
-import { useAuthenticationStatus } from './AuthenticationContext';
+} from "react";
+import { useAccount, useAccountEffect, useConfig } from "wagmi";
+import { useConnectionStatus } from "../../hooks/useConnectionStatus";
+import { AccountModal } from "../AccountModal/AccountModal";
+import { ChainModal } from "../ChainModal/ChainModal";
+import { ConnectModal } from "../ConnectModal/ConnectModal";
+import { useAuthenticationStatus } from "./AuthenticationContext";
 
 function useModalStateValue() {
   const [isModalOpen, setModalOpen] = useState(false);
+
+  console.log(
+    "isModalOpen --------------------------------------",
+    isModalOpen,
+  );
 
   return {
     closeModal: useCallback(() => setModalOpen(false), []),
@@ -90,7 +95,7 @@ export function ModalProvider({ children }: ModalProviderProps) {
     closeChainModal();
   }
 
-  const isUnauthenticated = useAuthenticationStatus() === 'unauthenticated';
+  const isUnauthenticated = useAuthenticationStatus() === "unauthenticated";
 
   useAccountEffect({
     onConnect: () => closeModals({ keepConnectModalOpen: isUnauthenticated }),
@@ -113,14 +118,14 @@ export function ModalProvider({ children }: ModalProviderProps) {
           connectModalOpen,
           isWalletConnectModalOpen,
           openAccountModal:
-            isCurrentChainSupported && connectionStatus === 'connected'
+            isCurrentChainSupported && connectionStatus === "connected"
               ? openAccountModal
               : undefined,
           openChainModal:
-            connectionStatus === 'connected' ? openChainModal : undefined,
+            connectionStatus === "connected" ? openChainModal : undefined,
           openConnectModal:
-            connectionStatus === 'disconnected' ||
-            connectionStatus === 'unauthenticated'
+            connectionStatus === "disconnected" ||
+            connectionStatus === "unauthenticated"
               ? openConnectModal
               : undefined,
           setIsWalletConnectModalOpen,

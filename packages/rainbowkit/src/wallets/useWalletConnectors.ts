@@ -1,25 +1,25 @@
-import { Config, Connector, useConnect } from 'wagmi';
-import { ConnectMutateAsync } from 'wagmi/query';
-import { useWalletConnectOpenState } from '../components/RainbowKitProvider/ModalContext';
-import { indexBy } from '../utils/indexBy';
+import { Config, Connector, useConnect } from "wagmi";
+import { ConnectMutateAsync } from "wagmi/query";
+import { useWalletConnectOpenState } from "../components/RainbowKitProvider/ModalContext";
+import { indexBy } from "../utils/indexBy";
 import {
   useInitialChainId,
   useRainbowKitChains,
-} from './../components/RainbowKitProvider/RainbowKitChainContext';
-import { WagmiConnectorInstance, WalletInstance } from './Wallet';
+} from "./../components/RainbowKitProvider/RainbowKitChainContext";
+import { WagmiConnectorInstance, WalletInstance } from "./Wallet";
 import {
   getDesktopDownloadUrl,
   getExtensionDownloadUrl,
   getMobileDownloadUrl,
-} from './downloadUrls';
+} from "./downloadUrls";
 import {
   connectorsWithRecentWallets,
   isEIP6963Connector,
   isRainbowKitConnector,
   isRecentWallet,
   rainbowKitConnectorWithWalletConnect,
-} from './groupedWallets';
-import { addRecentWalletId, getRecentWalletIds } from './recentWalletIds';
+} from "./groupedWallets";
+import { addRecentWalletId, getRecentWalletIds } from "./recentWalletIds";
 
 export interface WalletConnector extends WalletInstance {
   ready?: boolean;
@@ -45,13 +45,17 @@ export function useWalletConnectors(
 
   const { setIsWalletConnectModalOpen } = useWalletConnectOpenState();
 
-  const defaultConnectors = defaultCreatedConnectors.map((connector) => ({
-    ...connector,
-    // rkDetails is optional it does not exist in eip6963 connectors.
-    // We only inject `rkDetails` in `connectorsForWallets` when we
-    // want to have additional information in the connector.
-    ...(connector.rkDetails || {}),
-  })) as WalletInstance[];
+  const defaultConnectors = defaultCreatedConnectors.map((connector) => {
+    console.log("The default conenctor are-----------", connector.id);
+
+    return {
+      ...connector,
+      // rkDetails is optional it does not exist in eip6963 connectors.
+      // We only inject `rkDetails` in `connectorsForWallets` when we
+      // want to have additional information in the connector.
+      ...(connector.rkDetails || {}),
+    };
+  }) as WalletInstance[];
 
   async function connectWallet(connector: Connector) {
     const walletChainId = await connector.getChainId();
@@ -84,9 +88,9 @@ export function useWalletConnectors(
     } catch (err) {
       const isUserRejection =
         // @ts-expect-error - Web3Modal v1 error name
-        err.name === 'UserRejectedRequestError' ||
+        err.name === "UserRejectedRequestError" ||
         // @ts-expect-error - Web3Modal v2 error message on desktop
-        err.message === 'Connection request reset. Please try again.';
+        err.message === "Connection request reset. Please try again.";
 
       setIsWalletConnectModalOpen(false);
 
@@ -102,7 +106,7 @@ export function useWalletConnectors(
   ): Promise<string> => {
     const provider = await connector.getProvider();
 
-    if (connector.id === 'coinbase') {
+    if (connector.id === "coinbase") {
       // @ts-expect-error
       return provider.qrUrl;
     }
@@ -110,7 +114,7 @@ export function useWalletConnectors(
     return new Promise<string>((resolve) =>
       // Wagmi v2 doesn't have a return type for provider yet
       // @ts-expect-error
-      provider.once('display_uri', (uri) => {
+      provider.once("display_uri", (uri) => {
         resolve(uriConverter(uri));
       }),
     );
@@ -118,18 +122,16 @@ export function useWalletConnectors(
 
   const walletConnectModalConnector = defaultConnectors.find(
     (connector) =>
-      connector.id === 'walletConnect' &&
+      connector.id === "walletConnect" &&
       connector.isWalletConnectModalConnector,
   );
 
-  const eip6963Connectors = defaultConnectors
-    .filter(isEIP6963Connector)
-    .map((connector) => {
-      return {
-        ...connector,
-        groupIndex: 0,
-      };
-    });
+  const eip6963Connectors = defaultConnectors.map((connector) => {
+    return {
+      ...connector,
+      groupIndex: 0,
+    };
+  });
 
   const rainbowKitConnectors = defaultConnectors
     .filter(isRainbowKitConnector)
@@ -160,7 +162,10 @@ export function useWalletConnectors(
   const MAX_RECENT_WALLETS = 3;
 
   const recentWallets: WalletInstance[] = getRecentWalletIds()
-    .map((walletId) => walletInstanceById[walletId])
+    .map((walletId) => {
+      console.log("The received wallet in recentWwallets are", walletId);
+      return walletInstanceById[walletId];
+    })
     .filter(Boolean)
     .slice(0, MAX_RECENT_WALLETS);
 
@@ -172,6 +177,7 @@ export function useWalletConnectors(
   });
 
   for (const wallet of combinedConnectorsWithRecentWallets) {
+    console.log("THe wallets in useWalletConnectoModdal", wallet.id);
     if (!wallet) continue;
 
     const eip6963 = isEIP6963Connector(wallet);
@@ -184,7 +190,7 @@ export function useWalletConnectors(
         iconUrl: wallet.icon!,
         ready: true,
         connect: () => connectWallet(wallet),
-        groupName: 'Installed',
+        groupName: "Installed",
         recent,
       });
 
@@ -214,5 +220,13 @@ export function useWalletConnectors(
         : undefined,
     });
   }
+
+  for (const wallet of walletConnectors) {
+    console.log(
+      "LAST LOOPS: The wallets in useWalletConnectoModdal",
+      wallet.id,
+    );
+  }
+
   return walletConnectors;
 }
