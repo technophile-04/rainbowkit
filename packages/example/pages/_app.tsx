@@ -132,6 +132,7 @@ import { BaseError } from "wagmi";
 // --------------------------------------------------------------------
 
 const loadBurnerSK = () =>
+  // NOTE: This is raondomly generate private key, do not try to fund it or use it. Anything you send to this address will be lost.
   `0x264d2f223bdccc89961a711702a1b556575b49a92ab33e71518ee3451cf3aa98` as const;
 
 export const burnerWalletId = "burnerWallet";
