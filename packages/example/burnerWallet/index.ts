@@ -14,7 +14,5 @@ export const burnerWalletConfig = (): Wallet => ({
   name: burnerWalletName,
   iconUrl: burnerWalletIconBase64,
   iconBackground: '#ffffff',
-  createConnector: () => {
-    return createBurnerConnector();
-  },
+  createConnector: createBurnerConnector,
 });

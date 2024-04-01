@@ -1,3 +1,4 @@
+import { WalletDetailsParams } from '@rainbow-me/rainbowkit';
 import {
   http,
   EIP1193RequestFn,
@@ -39,7 +40,7 @@ type Provider = ReturnType<
   Transport<'custom', Record<any, any>, EIP1193RequestFn<WalletRpcSchema>>
 >;
 
-export const createBurnerConnector = () => {
+export const createBurnerConnector = (walletDetails: WalletDetailsParams) => {
   let connected = true;
   let connectedChainId: number;
   return createConnector<Provider>((config) => ({
@@ -152,5 +153,6 @@ export const createBurnerConnector = () => {
       connected = false;
       return Promise.resolve();
     },
+    ...walletDetails,
   }));
 };
